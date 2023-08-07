@@ -1,0 +1,7 @@
+*.csv
+.idea
+*.logs
+log_*.txt
+temp-commands.sh
+logs
+*__pycache__*
