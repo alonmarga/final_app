@@ -29,14 +29,14 @@ services:
     stdin_open: true
     volumes: 
       - /var/shared_cloudera_quickstart:/media/shared_from_local
-  # application:
-  #   build: .
-  #   hostname: app
-  #   depends_on:
-  #     - cloudera
-  #     - postgres
-  #   ports:
-  #     - "8023:22"     # SSH
+  application:
+    build: .
+    hostname: app
+    depends_on:
+      - cloudera
+      - postgres
+    ports:
+      - "8023:22"     # SSH
   postgres:
     image: postgres:15
     environment:

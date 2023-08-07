@@ -15,6 +15,6 @@ RUN apt install nano
 COPY . /app
 
 # Install dependencies
-#RUN pip3 install -r /app/requirements.txt
+RUN pip3 install -r /app/requirements.txt
 
 CMD exec /bin/bash -c "trap : TERM INT; sleep infinity & wait"
