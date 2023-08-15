@@ -83,7 +83,7 @@ services:
       # Where our data will be persisted
     volumes:
       - ./mysql:/var/lib/mysql
-  web:
+  nginx:
     image: nginx
     volumes:
       - ./templates:/etc/nginx/templates
