@@ -1,8 +1,6 @@
-
 hdfs3==0.3.1
 jupyter==1.0.0
 kafka-python==2.0.2
 mysql-connector==2.2.9
 pandas==1.2.1
 pycountry==22.3.5
-
