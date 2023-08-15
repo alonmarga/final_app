@@ -2,10 +2,10 @@ import os
 import pandas as pd
 
 def export_dataframe_by_date(input_df):
-    output_path = r'C:\Alon\outout_by_date'
+    output_path = 'outout_by_date'
     input_df['purchase_time'] = pd.to_datetime(input_df['purchase_time'])
 
-    # Group by date and export
+ 
     grouped = input_df.groupby(input_df['purchase_time'].dt.date)
 
     for date, group in grouped:
