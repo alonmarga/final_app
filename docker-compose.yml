@@ -1,48 +1,65 @@
-version: '2'
+
+version: '3'
 services:
-  cloudera:
-    image: cloudera/quickstart:latest
-    privileged: true
-    hostname: quickstart.cloudera
-    command: /usr/bin/docker-quickstart
-    ports:
-      - "8020:8020"   # HDFS 
-      - "8022:22"     # SSH
-      - "7180:7180"   # Cloudera Manager
-      - "8888:8888"   # Hue
-      - "11000:11000" # Oozie
-      - "50070:50070" # HDFS Rest Namenode
-      - "50075:50075" # HDFS Rest Datanode
-      - "2181:2181"   # Zookeeper
-      - "8088:8088"   # YARN Resource Manager
-      - "19888:19888" # MapReduce Job History
-      - "50030:50030" # MapReduce Job Tracker
-      - "8983:8983"   # Solr
-      - "16000:16000" # Sqoop Metastore
-      - "8042:8042"   # YARN Node Manager
-      - "60010:60010" # HBase Master
-      - "60030:60030" # HBase Region
-      - "9090:9090"   # HBase Thrift
-      - "8080:8080"   # HBase Rest
-      - "7077:7077"   # Spark Master
-    tty: true
-    stdin_open: true
-    volumes: 
-      - /var/shared_cloudera_quickstart:/media/shared_from_local
-  application:
-    build: .
-    hostname: app
-    depends_on:
-      - cloudera
-      - postgres
-    ports:
-      - "8023:22"     # SSH
-  postgres:
-    image: postgres:15
+
+  namenode:
+    image: bde2020/hadoop-namenode:2.0.0-hadoop2.7.4-java8
+    container_name: namenode
+    volumes:
+      - ./hdfs/namenode:/hadoop/dfs/name
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_DB: root
-  grafana:
-    image: grafana/grafana-oss
+      - CLUSTER_NAME=hive
+    env_file:
+      - .config
     ports:
-      - "3000:3000"
+      - "50070:50070"
+
+  datanode:
+    image: bde2020/hadoop-datanode:2.0.0-hadoop2.7.4-java8
+    container_name: datanode
+    volumes:
+      - ./hdfs/datanode:/hadoop/dfs/data
+    env_file:
+      - .config
+    environment:
+      SERVICE_PRECONDITION: "namenode:50070"
+    depends_on:
+      - namenode
+    ports:
+      - "50075:50075"
+
+  hive-server:
+    image: bde2020/hive:2.3.2-postgresql-metastore
+    container_name: hive-server
+    volumes:
+      - ./employee:/employee
+    env_file:
+      - .config
+    environment:
+      HIVE_CORE_CONF_javax_jdo_option_ConnectionURL: "jdbc:postgresql://hive-metastore/metastore"
+      SERVICE_PRECONDITION: "hive-metastore:9083"
+    depends_on:
+      - hive-metastore
+    ports:
+      - "10000:10000"
+
+  hive-metastore:
+    image: bde2020/hive:2.3.2-postgresql-metastore
+    container_name: hive-metastore
+    env_file:
+      - .config
+    command: /opt/hive/bin/hive --service metastore
+    environment:
+      SERVICE_PRECONDITION: "namenode:50070 datanode:50075 hive-metastore-postgresql:5432"
+    depends_on:
+      - hive-metastore-postgresql
+    ports:
+      - "9083:9083"
+
+  hive-metastore-postgresql:
+    image: bde2020/hive-metastore-postgresql:2.3.0
+    container_name: hive-metastore-postgresql
+    volumes:
+      - ./metastore-postgresql/postgresql/data:/var/lib/postgresql/data
+    depends_on:
+      - datanode
