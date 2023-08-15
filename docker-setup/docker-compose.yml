@@ -63,3 +63,8 @@ services:
       - ./metastore-postgresql/postgresql/data:/var/lib/postgresql/data
     depends_on:
       - datanode
+  grafana:
+    image: grafana/grafana-oss
+    container_name: grafana
+    volumes:
+      - ${PWD}/data:/var/lib/grafana
