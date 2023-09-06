@@ -5,28 +5,28 @@ from pii.mockaroo import create_mock_pii
 from products.sales_generator import generate_mock_purchase_data
 from get_population_data.add_cities import get_country_code, add_random_city, get_cities_file
 from products.calcs import calc_total, create_invoice_data
-from branches.online import split_purchases
+# from branches.online import split_purchases
 from logs.logger_config import setup_logger
 from export_final_data.export_data_by_month import export_dataframe_by_date
 
-log_file_directory = 'logs'
+log_file_directory = 'log_files'
 # log_file_directory = r"C:\\Alon\\log_files\\"  # Directory where the log file will be stored
 log_file_name = f"log_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.txt"  # Log file name with timestamp
 log_file_path = os.path.join(log_file_directory, log_file_name)
 
 logger = setup_logger(log_file_path)
 
-output_path = 'outputs'
+output_file_directory = 'outputs'
 # output_path = r"C:\\Alon\\output_files\\"
 output_file_name = f"output_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.csv"
-output_file_path = os.path.join(os.path.dirname(output_path), output_file_name)
+output_file_path = os.path.join(output_file_directory, output_file_name)
 
 if not os.path.exists(log_file_directory):
     os.makedirs(log_file_directory)
 
 # Check if output_path exists, if not, create it
-if not os.path.exists(output_path):
-    os.makedirs(output_path)
+if not os.path.exists(output_file_directory):
+    os.makedirs(output_file_directory)
 
 max_num_purchases = int(input("Enter the maximum number of purchases per customer: "))
 logger.info(f"logs of file: {output_file_path}")

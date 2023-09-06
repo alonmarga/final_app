@@ -1,8 +1,11 @@
 import os
 import pandas as pd
 
+output_path = 'output_by_date'
+if not os.path.exists(output_path):
+    os.makedirs(output_path)
+
 def export_dataframe_by_date(input_df):
-    output_path = 'outout_by_date'
     input_df['purchase_time'] = pd.to_datetime(input_df['purchase_time'])
 
  
@@ -11,4 +14,4 @@ def export_dataframe_by_date(input_df):
     for date, group in grouped:
         filename = os.path.join(output_path, f"export_{date}.csv")
         group.to_csv(filename, index=False)
-        print(f"Exported {len(group)} rows to {filename}")
+        # print(f"Exported {len(group)} rows to {filename}")

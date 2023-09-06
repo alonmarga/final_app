@@ -1,0 +1,55 @@
+import os
+import pandas as pd
+import pyarrow as pa
+import pyarrow.parquet as pq
+
+# Directory containing CSV files
+directory_path = '/home/alonm/final_app/output_by_date'
+
+# Define HDFS path
+hdfs_path = '/sales_data'
+
+# Connect to HDFS
+fs = pa.fs.HadoopFileSystem(host='localhost', port=8020, user='root')
+
+# Check if the directory exists in HDFS
+try:
+    fs.get_file_info(hdfs_path)
+except pa.lib.ArrowIOError:
+    # Create the directory if it doesn't exist
+    fs.mkdir(hdfs_path)
+
+
+
+# Specify partition columns
+partition_cols = ['year', 'month', 'day']
+fs.get_file_info(pa.fs.FileSelector('/sales_data/year=2022/month=10',recursive=true))
+
+pq.read_table('/sales_data/year=2022/month=10/day=9/fc1b133e36334c998f4472eed34496e7-0.parquet',filesystem=fs)
+
+# Iterate over CSV files in the directory
+for file_name in os.listdir(directory_path):
+    print('file_name')
+    if file_name.endswith(".csv"):
+        print('file_name')
+        file_path = os.path.join(directory_path, file_name)
+
+        # Read CSV file
+        df = pd.read_csv(file_path)
+        print(df)
+        # Convert purchase_time to datetime
+        df['purchase_time'] = pd.to_datetime(df['purchase_time'])
+
+        # Extract year, month, and day
+        df['year'] = df['purchase_time'].dt.year
+        df['month'] = df['purchase_time'].dt.month
+        df['day'] = df['purchase_time'].dt.day
+
+        # Convert DataFrame to Arrow Table
+        table = pa.Table.from_pandas(df)
+        print(table.to_pandas())
+        # Write table to HDFS with partitioning
+       pq.write_to_dataset(table.to_pandas(), root_path=hdfs_path, partition_cols=partition_cols, filesystem=fs)
+
+selector = pa.fs.FileSelector(hdfs_path, recursive=True)
+print(len(fs.get_file_info(selector)))

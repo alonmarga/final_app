@@ -13,6 +13,7 @@ services:
       - .config
     ports:
       - "50070:50070"
+      - "8020:8020"
 
   datanode:
     image: bde2020/hadoop-datanode:2.0.0-hadoop2.7.4-java8
@@ -32,6 +33,7 @@ services:
     container_name: hive-server
     volumes:
       - ./employee:/employee
+      - ./hive:/hive
     env_file:
       - .config
     environment:
@@ -62,6 +64,13 @@ services:
       - ./metastore-postgresql/postgresql/data:/var/lib/postgresql/data
     depends_on:
       - datanode
+  hue:
+    image: gethue/hue:latest
+    container_name: hue
+    ports:
+      - 8888:8888
+    volumes:
+    - ./hue:/usr/share/hue/desktop/conf/
   grafana:
     image: grafana/grafana-oss
     container_name: grafana
@@ -116,7 +125,20 @@ services:
       - '3306'
       # Where our data will be persisted
     volumes:
-      - ./mysql:/var/lib/mysql
+      - /mysql:/var/lib/mysql
+  airflow:
+    image: puckel/docker-airflow
+    container_name: airflow
+    ports:
+      - 8181:8080 
+    expose:
+      # Opens port 3306 on the container
+      - '8080'
+    command: webserver
+    volumes:
+      - /airflow:/usr/local/airflow/airflow-dags
+
+
   nginx:
     image: nginx
     volumes:
