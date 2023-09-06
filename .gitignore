@@ -14,4 +14,4 @@ iso*
 *.dat
 
 docker-setup/**
-venv
+venv/
