@@ -15,3 +15,5 @@ iso*
 
 docker-setup/**
 venv/
+*.tar.gz
+*.parquet
