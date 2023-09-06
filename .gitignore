@@ -4,3 +4,13 @@
 log_*.txt
 temp-commands.sh
 *__pycache__*
+blk*
+ar*
+en*
+jupyter*
+ff_*
+fr_*
+iso*
+*.dat
+
+docker-setup/**
