@@ -1,7 +1,0 @@
-server {
-    listen   80;
-    server_name  p3000;
-    location / {
-        proxy_pass http://grafana:3000;
-    }
-}
